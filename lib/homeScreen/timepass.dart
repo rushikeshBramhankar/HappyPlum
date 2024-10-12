@@ -1,134 +1,277 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter/animation.dart';
-// import 'dart:math';
+import 'package:flutter/material.dart';
 
-// class ShakingContainer extends StatefulWidget {
-//   const ShakingContainer({super.key});
+class Timepass extends StatefulWidget {
+  const Timepass({super.key});
 
-//   @override
-//   _ShakingContainerState createState() => _ShakingContainerState();
-// }
+  @override
+  State<Timepass> createState() => _TimepassState();
+}
 
-// class _ShakingContainerState extends State<ShakingContainer>
-//     with SingleTickerProviderStateMixin {
-//   late AnimationController _controller;
-//   late Animation<double> _animation;
+class _TimepassState extends State<Timepass> with TickerProviderStateMixin {
+  late AnimationController _treeController;
+  late AnimationController _zoomController;
+  late Animation<double> _treeAnimation;
+  late Animation<double> _zoomAnimation;
 
-//   @override
-//   void initState() {
-//     super.initState();
+  // Separate AnimationControllers for each plum text fade-in
+  late AnimationController _firstTextController;
+  late AnimationController _secondTextController;
+  late AnimationController _thirdTextController;
 
-//     // Initialize the AnimationController
-//     _controller = AnimationController(
-//       duration: const Duration(seconds: 1),
-//       vsync: this,
-//     );
+  late Animation<double> _firstTextOpacityAnimation;
+  late Animation<double> _secondTextOpacityAnimation;
+  late Animation<double> _thirdTextOpacityAnimation;
 
-//     // Define the shaking animation from -30 to 30 degrees (left to right)
-//     _animation = Tween<double>(begin: -7.0, end: 7.0)
-//         .chain(CurveTween(curve: Curves.elasticInOut))
-//         .animate(_controller)
-//       ..addStatusListener((status) {
-//         if (status == AnimationStatus.completed) {
-//           _controller.reverse(); // Reverse when animation completes
-//         } else if (status == AnimationStatus.dismissed) {
-//           _controller.forward(); // Repeat the animation
-//         }
-//       });
+  bool _showFirstPlum = false;
+  bool _showSecondPlum = false;
+  bool _showThirdPlum = false;
+  bool _showBaby = false; // Initially hide the baby image
+  bool _showThinkingContainer = false; // Initially hide the thinking container
 
-//     // Start the shaking animation
-//     _controller.forward();
-//   }
+  @override
+  void initState() {
+    super.initState();
 
-//   @override
-//   void dispose() {
-//     _controller.dispose(); // Dispose of the controller when done
-//     super.dispose();
-//   }
+    // Tree animation
+    _treeController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 3),
+    );
 
-//   @override
-//   Widget build(BuildContext context) {
-//     final double screenWidth = MediaQuery.of(context).size.width;
-//     return Center(
-//       // Center to ensure position stays unchanged
-//       child: AnimatedBuilder(
-//         animation: _controller,
-//         builder: (context, child) {
-//           return Transform.rotate(
-//             angle: _animation.value * pi / 360, // Convert degrees to radians
-//             child: Container(
-//               height: 289,
-//               width: (screenWidth / 2) - 20,
-//               margin:
-//                   const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8.0),
-//               child: Material(
-//                 elevation: 5,
-//                 borderRadius: BorderRadius.circular(10),
-//                 color: Colors.purple[200],
-//                 child: Column(
-//                   crossAxisAlignment: CrossAxisAlignment.start,
-//                   children: [
-//                     ClipRRect(
-//                       borderRadius: const BorderRadius.only(
-//                         topLeft: Radius.circular(10),
-//                         topRight: Radius.circular(10),
-//                       ),
-//                       child: Image.network(
-//                         'https://images.pexels.com/photos/104827/cat-pet-animal-domestic-104827.jpeg?auto=compress&cs=tinysrgb&w=400',
-//                         height: 170,
-//                         width: double.infinity,
-//                         fit: BoxFit.fill,
-//                       ),
-//                     ),
-//                     const SizedBox(
-//                       height: 10,
-//                     ),
-//                     const Center(
-//                       child: Text(
-//                         'Cat',
-//                         style: TextStyle(
-//                           color: Colors.white,
-//                           fontSize: 22,
-//                           fontWeight: FontWeight.w500,
-//                           letterSpacing: 0.4,
-//                         ),
-//                       ),
-//                     ),
-//                     const SizedBox(
-//                       height: 5,
-//                     ),
-//                     const Center(
-//                       child: Text(
-//                         'बिल्ली',
-//                         style: TextStyle(
-//                           color: Colors.white,
-//                           fontSize: 22,
-//                           fontWeight: FontWeight.w500,
-//                           letterSpacing: 0.4,
-//                         ),
-//                       ),
-//                     ),
-//                     const SizedBox(
-//                       height: 5,
-//                     ),
-//                     const Center(
-//                       child: Text(
-//                         'मांजर',
-//                         style: TextStyle(
-//                           color: Colors.white,
-//                           fontSize: 22,
-//                           fontWeight: FontWeight.w500,
-//                           letterSpacing: 0.4,
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           );
-//         },
-//       ),
-//     );
-//   }
-// }
+    _treeAnimation = Tween<double>(begin: 1.0, end: 1.2)
+        .chain(CurveTween(curve: Curves.easeInOut))
+        .animate(_treeController)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _treeController.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          _treeController.forward();
+        }
+      });
+
+    // Zoom animation for plums
+    _zoomController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    )..repeat(reverse: true);
+
+    _zoomAnimation = Tween<double>(begin: 1.0, end: 1.1)
+        .chain(CurveTween(curve: Curves.easeInOut))
+        .animate(_zoomController);
+
+    // Fade-in animation for text containers
+    _firstTextController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+
+    _secondTextController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+
+    _thirdTextController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 1),
+    );
+
+    _firstTextOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _firstTextController, curve: Curves.easeIn),
+    );
+
+    _secondTextOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _secondTextController, curve: Curves.easeIn),
+    );
+
+    _thirdTextOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _thirdTextController, curve: Curves.easeIn),
+    );
+
+    // Start tree animation
+    _treeController.forward();
+
+    // Delayed appearance of plums and their text containers with increased delay
+    Future.delayed(const Duration(seconds: 3), () {
+      setState(() {
+        _showFirstPlum = true;
+        _firstTextController.forward();
+        _showBaby = true; // Baby appears after the first plum
+      });
+
+      // Show the thinking container 2 seconds after the first plum appears
+      Future.delayed(const Duration(seconds: 2), () {
+        setState(() {
+          _showThinkingContainer = true;
+        });
+      });
+    });
+
+    Future.delayed(const Duration(seconds: 6), () {
+      // Increased delay
+      setState(() {
+        _showSecondPlum = true;
+        _secondTextController.forward();
+      });
+    });
+
+    Future.delayed(const Duration(seconds: 9), () {
+      // Increased delay
+      setState(() {
+        _showThirdPlum = true;
+        _thirdTextController.forward();
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _treeController.dispose();
+    _zoomController.dispose();
+    _firstTextController.dispose();
+    _secondTextController.dispose();
+    _thirdTextController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.purple[400],
+        title: const Center(
+          child: Text(
+            'MAGIC PLUM TREE',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 25),
+              // Animated Tree
+              Center(
+                child: AnimatedBuilder(
+                  animation: _treeAnimation,
+                  builder: (context, child) {
+                    return Transform.scale(
+                      scale: _treeAnimation.value,
+                      child: child,
+                    );
+                  },
+                  child: Image.asset(
+                    'assets/tree.png',
+                    height: 390,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 25),
+              // Plum Images Row with appearance animation and zoom
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  _showFirstPlum
+                      ? buildPlumColumn('Bonjour', _firstTextOpacityAnimation)
+                      : const SizedBox.shrink(),
+                  _showSecondPlum
+                      ? buildPlumColumn('早上好', _secondTextOpacityAnimation)
+                      : const SizedBox.shrink(),
+                  _showThirdPlum
+                      ? buildPlumColumn('buen día', _thirdTextOpacityAnimation)
+                      : const SizedBox.shrink(),
+                ],
+              ),
+              const SizedBox(height: 15),
+              // Baby image appears after the first plum
+              if (_showBaby)
+                Align(
+                  alignment: Alignment.bottomRight,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(0, 2, 20, 20),
+                    child: Image.asset(
+                      'assets/baby.png',
+                      height: 200,
+                    ),
+                  ),
+                ),
+              const SizedBox(height: 20),
+              // Thinking container appears after 2 seconds
+              if (_showThinkingContainer)
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.yellow[200],
+                    borderRadius: BorderRadius.circular(15),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        spreadRadius: 5,
+                      ),
+                    ],
+                  ),
+                  child: const Text(
+                    "Let's learn the greeting today!!",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Plum column with text container and zoom animation
+  Column buildPlumColumn(String text, Animation<double> textOpacityAnimation) {
+    return Column(
+      children: [
+        // Plum image with zoom animation
+        ScaleTransition(
+          scale: _zoomAnimation,
+          child: Center(
+            child: Image.asset(
+              'assets/plum.png',
+              height: 120,
+            ),
+          ),
+        ),
+        const SizedBox(height: 15),
+        // Text container with individual fade-in animation
+        FadeTransition(
+          opacity: textOpacityAnimation,
+          child: Container(
+            height: 50,
+            width: 100,
+            child: Material(
+              elevation: 5,
+              borderRadius: BorderRadius.circular(10),
+              color: const Color.fromARGB(255, 111, 190, 114),
+              child: Center(
+                child: Text(
+                  text,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}

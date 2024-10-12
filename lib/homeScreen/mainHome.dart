@@ -3,7 +3,7 @@ import 'package:happy_plum/homeScreen/animals.dart';
 import 'package:happy_plum/homeScreen/details.dart';
 import 'package:happy_plum/homeScreen/lessons.dart';
 import 'package:happy_plum/homeScreen/quiz.dart';
-import 'package:happy_plum/homeScreen/timepass.dart';
+
 import 'package:flutter/animation.dart';
 import 'dart:math';
 
