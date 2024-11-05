@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:happy_plum/homeScreen/game.dart';
 import 'dart:async';
 
 import 'package:happy_plum/main.dart';
@@ -35,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen>
     // After 3 seconds, navigate to the next screen
     Timer(Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(MaterialPageRoute(
-        builder: (context) => WebViewApp(),
+        builder: (context) => MemoryGameScreen(),
       ));
     });
   }

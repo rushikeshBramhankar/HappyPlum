@@ -3,7 +3,7 @@ import 'package:happy_plum/splash.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // For Shared Preferences
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() => runApp(
     MaterialApp(debugShowCheckedModeBanner: false, home: SplashScreen()));
